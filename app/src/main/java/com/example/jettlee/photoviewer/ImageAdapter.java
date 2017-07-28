@@ -1,9 +1,6 @@
 package com.example.jettlee.photoviewer;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,50 +9,69 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
-/**
- * Created by jettlee on 7/14/17.
- */
+
 
 public class ImageAdapter extends BaseAdapter {
-    private Context mContext;
-    private List path;
 
-    public ImageAdapter(Context c, List coll) {
-        mContext = c;
-        path = coll;
+    private Context context;
+    private List coll;
+
+    public ImageAdapter(Context context, List coll){
+
+        super();
+        this.context = context;
+        this.coll = coll;
     }
 
-    public int getCount() {
-        return path.size();
+    public View getView(final int position, View convertView, ViewGroup parent){
+        LayoutInflater inflater = (LayoutInflater) context.
+                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View rowview = inflater.inflate(R.layout.item_photo, parent, false);
+        ViewGroup layout = (ViewGroup) rowview.findViewById(R.id.rl_item_photo);
+        ImageView imageView = (ImageView) rowview.findViewById(R.id.imageView);
+
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        float dd = dm.density;
+        float px = 25*dd;
+        float screenWidth = dm.widthPixels;
+        int newWidth = (int) (screenWidth-px)/4;
+
+        layout.setLayoutParams(new GridView.LayoutParams(newWidth, newWidth));
+        imageView.setId(position);
+
+
+        /***Bitmap bm = MediaStore.Images.Thumbnails.getThumbnail(context.getApplicationContext()
+                        .getContentResolver(), Long.parseLong((String) coll.get(position)),
+                MediaStore.Images.Thumbnails.MICRO_KIND, null);
+        ***/
+
+        Glide.with(context).load(coll.get(position)).into(imageView);
+        //imageView.setImageBitmap(bm);
+        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+
+
+
+        return rowview;
     }
 
-    public Object getItem(int position) {
-        return null;
+    @Override
+    public int getCount(){
+        return coll.size();
     }
 
-    public long getItemId(int position) {
-        return 0;
+    @Override
+    public Object getItem(int arg0){
+        return coll.get(arg0);
     }
 
-    // create a new ImageView for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        if (convertView == null) {
-            // if it's not recycled, initialize some attributes
-            imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
-        } else {
-            imageView = (ImageView) convertView;
-        }
-
-        Bitmap bm = BitmapFactory.decodeFile((String)path.get(position));
-        imageView.setImageBitmap(bm);
-        return imageView;
+    @Override
+    public long getItemId(int position){
+        return position;
     }
-
 
 }
