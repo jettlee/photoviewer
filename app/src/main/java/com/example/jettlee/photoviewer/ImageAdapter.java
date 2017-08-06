@@ -14,26 +14,28 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 
-
 public class ImageAdapter extends BaseAdapter {
 
     private Context context;
     private List coll;
 
-    public ImageAdapter(Context context, List coll){
+    public ImageAdapter(Context context){
 
         super();
         this.context = context;
-        this.coll = coll;
+        this.coll = SingletonPhotoModel.getInstance().getImagePathArray();
     }
 
     public View getView(final int position, View convertView, ViewGroup parent){
-        LayoutInflater inflater = (LayoutInflater) context.
-                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if(convertView==null){
+            LayoutInflater inflater = (LayoutInflater) context.
+                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.item_photo, parent, false);
 
-        View rowview = inflater.inflate(R.layout.item_photo, parent, false);
-        ViewGroup layout = (ViewGroup) rowview.findViewById(R.id.rl_item_photo);
-        ImageView imageView = (ImageView) rowview.findViewById(R.id.imageView);
+        }
+
+        ViewGroup layout = (ViewGroup) convertView.findViewById(R.id.rl_item_photo);
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.imageView);
 
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         float dd = dm.density;
@@ -42,21 +44,13 @@ public class ImageAdapter extends BaseAdapter {
         int newWidth = (int) (screenWidth-px)/4;
 
         layout.setLayoutParams(new GridView.LayoutParams(newWidth, newWidth));
-        imageView.setId(position);
-
-
-        /***Bitmap bm = MediaStore.Images.Thumbnails.getThumbnail(context.getApplicationContext()
-                        .getContentResolver(), Long.parseLong((String) coll.get(position)),
-                MediaStore.Images.Thumbnails.MICRO_KIND, null);
-        ***/
 
         Glide.with(context).load(coll.get(position)).into(imageView);
-        //imageView.setImageBitmap(bm);
         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
 
 
 
-        return rowview;
+        return convertView;
     }
 
     @Override
